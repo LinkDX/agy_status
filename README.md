@@ -2,7 +2,7 @@
 
 一個專為 **Antigravity CLI (agy)** 設計的高質感**原生狀態列 (Native Footer)** 一鍵配置工具。
 
-本專案使用**純原生 Node.js (零外部依賴)** 實作，能完美相容於 **Windows、macOS 與 Linux**。它會自動在全域部署核心數據抓取與渲染腳本（`statusline-quota.mjs` 與 `fetch-local-quota.mjs`），並為您的全域及 CLI 專屬設定檔（`settings.json`）注入自訂狀態列指令與欄位排序設定，提供互動式的語言與欄位編輯選單！
+本專案基於 [AndyAWD/antigravity-cli-statusline](https://github.com/AndyAWD/antigravity-cli-statusline) 的架構靈感，並使用**純原生 Node.js (零外部依賴)** 實作，能完美相容於 **Windows、macOS 與 Linux**。它會自動在全域部署核心數據抓取與渲染腳本（`statusline-quota.mjs` 與 `fetch-local-quota.mjs`），並為您的全域及 CLI 專屬設定檔（`settings.json`）注入自訂狀態列指令與欄位排序設定，提供互動式的語言與欄位編輯選單！
 
 ---
 
