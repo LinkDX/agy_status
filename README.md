@@ -2,7 +2,7 @@
 
 一個專為 **Antigravity CLI (agy)** 設計的高質感**原生狀態列 (Native Footer)** 一鍵配置工具。
 
-本專案使用**純原生 Node.js (零外部依賴)** 實作，能完美相容於 **Windows、macOS 與 Linux**。它會自動為您的全域及 CLI 專屬設定檔（`settings.json`）注入目前這台電腦上最完整、最高質感的原生狀態列排序與欄位指標設定，並提供互動式的語言選擇！
+本專案使用**純原生 Node.js (零外部依賴)** 實作，能完美相容於 **Windows、macOS 與 Linux**。它會自動在全域部署核心數據抓取與渲染腳本（`statusline-quota.mjs` 與 `fetch-local-quota.mjs`），並為您的全域及 CLI 專屬設定檔（`settings.json`）注入自訂狀態列指令與欄位排序設定，提供互動式的語言與欄位編輯選單！
 
 ---
 
@@ -30,8 +30,8 @@
 
 ## ✨ 狀態列指標排序與特色
 
-本專案安裝後，會將狀態列依序啟用以下 8 大核心指標：
-1. **📁 專案路徑 (`project-path`)**：顯示當前工作目錄的絕對路徑。
+本專案安裝後，會將狀態列依序啟用以下 9 大指標：
+1. **📁 專案路徑 (`project-path`)**：顯示當前工作目錄的絕對路徑。本指標具備**智慧響應式寬度調整 (RWD) 特性**，會自動根據您當前的終端機寬度（螢幕寬度）動態決定顯示簡短專案名或完整絕對路徑，不需手動配置其他重複的指標。
 2. **🌿 Git 分支 (`git-branch`)**：偵測當前 Git 分支。若工作區有未提交的 dirty 變更，會自動標記 `*`（如：`(main*)`）。
 3. **🤖 模型與 Effort 標記 (`model-name`)**：顯示當前對話採用的 AI 模型與思考深度（例如：`Gemini 3.5 Flash (Medium)`）。
 4. **🔋 可用額度 (`quota`)**：顯示當前帳號的剩餘 API 額度百分比。
@@ -39,6 +39,7 @@
 6. **💳 G1 Credits (`g1-credits`)**：顯示 G1 Credits 的餘額。
 7. **📊 Context 消耗 (`context-used`)**：即時顯示目前已消耗的 Context Window 比例。
 8. **🔢 Token 總數 (`token-count`)**：顯示當前對話所累積消耗的精確 Token 量。
+9. **💾 記憶體用量 (`memory-usage`)**：顯示 CLI 當前實體記憶體用量 (RAM)。
 
 ---
 

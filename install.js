@@ -97,6 +97,12 @@ const ITEMS_INFO = {
     zh: '🔢 Tok: 197.1k / 1.0M',
     en: '🔢 Tok: 197.1k / 1.0M',
     jp: '🔢 Tok: 197.1k / 1.0M'
+  },
+  'memory-usage': {
+    label: '記憶體用量 (memory-usage) - 顯示 CLI 當前佔用的實體記憶體用量 (RAM)',
+    zh: '💾 RAM: 54MB',
+    en: '💾 RAM: 54MB',
+    jp: '💾 RAM: 54MB'
   }
 };
 
@@ -108,7 +114,8 @@ const allAvailableIds = [
   'quota-reset-countdown',
   'g1-credits',
   'context-used',
-  'token-count'
+  'token-count',
+  'memory-usage'
 ];
 
 // ── 4. 讀取現有設定或樣板 ──
@@ -173,6 +180,13 @@ allAvailableIds.forEach(id => {
   }
 });
 
+// 強制將專案路徑 (project-path) 移動到最前面，以符合使用者習慣
+const pathIdx = items.findIndex(i => i.id === 'project-path');
+if (pathIdx > 0) {
+  const [pathItem] = items.splice(pathIdx, 1);
+  items.unshift(pathItem);
+}
+
 // ── 5. 互動狀態變數 ──
 let step = 1; // 1: 選擇語系, 2: 自訂項目與順序
 let selectedLang = existingLanguage || 'zh-tw';
@@ -181,7 +195,7 @@ let itemCursor = 0;
 
 const LANGUAGES = [
   { id: 'zh-tw', label: '繁體中文 (zh-tw)' },
-  { id: 'en', label: 'English (en)' },
+  { id: 'us', label: 'English (en)' },
   { id: 'jp', label: '日本語 (jp)' }
 ];
 
@@ -276,7 +290,7 @@ function startInteractiveConfig() {
           const info = ITEMS_INFO[id];
           if (info) {
             let val = info.zh;
-            if (selectedLang === 'en') val = info.en;
+            if (selectedLang === 'us') val = info.en;
             else if (selectedLang === 'jp') val = info.jp;
             previewParts.push(val);
           }
@@ -414,6 +428,29 @@ function startInteractiveConfig() {
 
 // ── 8. 寫入設定檔 ──
 function saveSettings(selectedLang, finalItems) {
+  // ── 8.0 複製 scripts 目錄下的核心檔案至全域 hooks ──
+  const hooksDir = path.join(homeDir, '.gemini', 'hooks');
+  try {
+    if (!fs.existsSync(hooksDir)) {
+      fs.mkdirSync(hooksDir, { recursive: true });
+    }
+    const scriptsSourceDir = path.join(__dirname, 'scripts');
+    const filesToCopy = ['statusline-quota.mjs', 'fetch-local-quota.mjs'];
+    
+    filesToCopy.forEach(fileName => {
+      const srcPath = path.join(scriptsSourceDir, fileName);
+      const destPath = path.join(hooksDir, fileName);
+      if (fs.existsSync(srcPath)) {
+        fs.copyFileSync(srcPath, destPath);
+        console.log(`${GREEN}✓ 成功複製檔案至 hooks：${destPath}${RESET}`);
+      } else {
+        console.log(`${YELLOW}⚠ 找不到原始 scripts 檔案：${srcPath}${RESET}`);
+      }
+    });
+  } catch (err) {
+    console.log(`${RED}❌ 複製核心 scripts 檔案至 hooks 失敗：${err.message}${RESET}`);
+  }
+
   console.log(`\n${BLUE}正在套用狀態列配置至系統設定檔...${RESET}`);
 
   // 更新本地的 statusline_config.json
@@ -462,6 +499,11 @@ function saveSettings(selectedLang, finalItems) {
       items: finalItems
     };
     settings.ui.language = selectedLang;
+
+    // 確保 statusLine 配置指向全域 hooks 中的 statusline-quota.mjs
+    if (!settings.statusLine) settings.statusLine = {};
+    settings.statusLine.type = "command";
+    settings.statusLine.command = "node " + path.join(homeDir, '.gemini', 'hooks', 'statusline-quota.mjs');
 
     // 額外美化：讓 chat 中顯示 Model 資訊，增強視覺
     settings.ui.showModelInfoInChat = true;

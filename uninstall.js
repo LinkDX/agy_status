@@ -50,6 +50,11 @@ const restoreSettingsFile = (filePath) => {
         settings.ui.language = 'zh-tw'; // 回復預設繁體中文
       }
       
+      // 移除客製化 statusline-quota.mjs 狀態列指令
+      if (settings.statusLine) {
+        delete settings.statusLine;
+      }
+      
       fs.writeFileSync(filePath, JSON.stringify(settings, null, 2), { encoding: 'utf8' });
       console.log(`${GREEN}✓ 成功還原預設值：${filePath}${RESET}`);
     } catch (e) {
@@ -60,6 +65,22 @@ const restoreSettingsFile = (filePath) => {
 
 restoreSettingsFile(globalSettingsFile);
 restoreSettingsFile(cliSettingsFile);
+
+// ── 移除安裝的核心 hooks 檔案 ──
+const hooksDir = path.join(homeDir, '.gemini', 'hooks');
+const filesToRemove = ['statusline-quota.mjs', 'fetch-local-quota.mjs'];
+
+filesToRemove.forEach(fileName => {
+  const filePath = path.join(hooksDir, fileName);
+  if (fs.existsSync(filePath)) {
+    try {
+      fs.unlinkSync(filePath);
+      console.log(`${GREEN}✓ 成功移除 hooks 檔案：${filePath}${RESET}`);
+    } catch (e) {
+      console.log(`${YELLOW}⚠ 移除 hooks 檔案 ${filePath} 失敗：${e.message}${RESET}`);
+    }
+  }
+});
 
 console.log(`\n${GREEN}====================================================${RESET}`);
 console.log(`${GREEN}${BOLD}🎉 還原成功！已回復為原廠預設狀態列配置。             ${RESET}`);
