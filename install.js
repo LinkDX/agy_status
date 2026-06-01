@@ -240,9 +240,9 @@ function startInteractiveConfig() {
       console.log(`${BLUE}${BOLD}   Antigravity Statusline 項目開關與順序編輯器       ${RESET}`);
       console.log(`${BLUE}====================================================${RESET}`);
       console.log(`\n${YELLOW}【操作說明】${RESET}`);
-      console.log(`  ${BOLD}↑ / ↓${RESET} : 移動游標       ${BOLD}Space${RESET} : 開啟/關閉項目`);
-      console.log(`  ${BOLD}← / a${RESET} : 向上移動順序   ${BOLD}→ / d${RESET} : 向下移動順序`);
-      console.log(`  ${BOLD}Enter${RESET} : 確認並儲存     ${BOLD}Ctrl+C${RESET} : 放棄並結束`);
+      console.log(`  ${BOLD}↑ / ↓${RESET} : 移動游標        ${BOLD}Space${RESET} : 開啟/關閉項目`);
+      console.log(`  ${BOLD}u${RESET} : 向上移動欄位順序  ${BOLD}d${RESET} : 向下移動欄位順序`);
+      console.log(`  ${BOLD}Enter${RESET} : 確認並儲存      ${BOLD}Ctrl+C${RESET} : 放棄並結束`);
       console.log(`----------------------------------------------------`);
 
       // 輸出項目清單
@@ -251,9 +251,12 @@ function startInteractiveConfig() {
         const checkbox = item.enabled ? `${GREEN}[✓]${RESET}` : `[ ]`;
         const cursorStr = isCurrent ? `${CYAN}➔${RESET}` : ' ';
         const info = ITEMS_INFO[item.id] || { label: item.id };
+        
+        // 醒目的排序指引標記
+        const orderTip = isCurrent ? `  ${YELLOW}← 按 u/d 可上下移動此項順序${RESET}` : '';
 
         if (isCurrent) {
-          console.log(` ${cursorStr} ${checkbox} ${BOLD}${YELLOW}${info.label}${RESET}`);
+          console.log(` ${cursorStr} ${checkbox} ${BOLD}${YELLOW}${info.label}${RESET}${orderTip}`);
         } else {
           console.log(` ${cursorStr} ${checkbox} ${info.label}`);
         }
@@ -350,6 +353,7 @@ function startInteractiveConfig() {
           items[itemCursor].enabled = !items[itemCursor].enabled;
           render();
           break;
+        case 'u':
         case 'left':
         case 'a':
           // 將目前項目往上移動 (往索引 0 移動)
@@ -361,8 +365,8 @@ function startInteractiveConfig() {
             render();
           }
           break;
-        case 'right':
         case 'd':
+        case 'right':
           // 將目前項目往下移動 (往索引尾端移動)
           if (itemCursor < items.length - 1) {
             const temp = items[itemCursor];
