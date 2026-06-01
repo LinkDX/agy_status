@@ -1,0 +1,16 @@
+{
+  "footer": {
+    "hideSandboxStatus": true,
+    "showLabels": true,
+    "items": [
+      "project-path",
+      "git-branch",
+      "model-name",
+      "quota",
+      "quota-reset-countdown",
+      "g1-credits",
+      "context-used",
+      "token-count"
+    ]
+  }
+}
