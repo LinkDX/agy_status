@@ -6,12 +6,25 @@
 
 ---
 
-## 🎨 狀態列排版設計
+## 🎨 狀態列排版設計 (多語系支援)
 
+### 繁體中文 (zh-tw)
 ```
 📁 ~/your-project-path  🌿 (main*)  💤  Gemini 3.5 Flash
 📊 Context: 12%  │  ⟳ 5h Reset: 4h12m  │  💳 G1: 982  │  🔋 Quota: 85.5%
 ```
+*(若 API 在重置狀態，會於 5h Reset 中顯示 **「已重置」**；載入中會顯示 **「待獲取」**。)*
+
+### 英文 (en)
+```
+📁 ~/your-project-path  🌿 (main*)  💤  Gemini 3.5 Flash
+📊 Context: 12%  │  ⟳ 5h Reset: 4h12m  │  💳 G1: 982  │  🔋 Quota: 85.5%
+```
+*(若 API 在重置狀態，會於 5h Reset 中顯示 **「Reset」**；載入中會顯示 **「Pending」**。)*
+
+---
+
+## ✨ 特色指標說明
 
 ### 第一行：核心環境資訊
 - **📁 工作路徑**：自動將您的 `$HOME` 路徑縮寫為 `~`，保持簡潔。
@@ -27,35 +40,46 @@
 
 ---
 
-## 🚀 快速安裝步驟
+## 🚀 快速安裝與配置步驟
 
-我們提供了一鍵式自動安裝腳本，以便您在新環境中快速部署。
+我們提供了全新升級的**互動式自動安裝腳本**，以便您在新環境中快速部署並自由切換語系。
 
 ### 1. 複製並安裝
-在您克隆專案後，直接執行資料夾內的 `install.sh` 即可：
+在您克隆專案後，直接執行資料夾內的 `install.sh`：
 
 ```bash
-# 克隆專案後進入目錄
+# 進入目錄
 cd agy_status
 
-# 執行自動安裝
+# 執行互動式安裝
 ./install.sh
 ```
 
-> [!IMPORTANT]
-> 安裝腳本會進行以下作業：
-> 1. 將狀態列腳本 `write_status.sh` 安全複製到 `~/.gemini/antigravity-cli/write_status.sh`。
-> 2. 在您的 `~/.bashrc` 中註冊狀態列啟動變數：
->    `export CLAUDE_STATUS_LINE_COMMAND="$HOME/.gemini/antigravity-cli/write_status.sh"`
+### 2. 安裝時的互動選擇
+執行腳本後，您將會看見以下選單，可直接輸入 `1` 或 `2` 來決定狀態列顯示的語言：
 
-### 2. 啟用狀態列
+```
+====================================================
+     歡迎使用 Antigravity Statusline 安裝與配置      
+====================================================
+
+[步驟 1/3] 請選擇狀態列顯示語系 / Please select statusline language:
+  1) 繁體中文 (zh-tw) [預設 / Default]
+  2) English (en)
+輸入選擇 (1 或 2) / Enter choice (1 or 2): 
+```
+
+> [!TIP]
+> 安裝腳本會將設定好的語系寫入至 `~/.gemini/antigravity-cli/statusline.conf` 中，核心狀態列腳本在啟動時會自動讀取此設定檔，確保多語系運作流暢且與核心代碼解耦。
+
+### 3. 啟用狀態列
 安裝完成後，請執行以下命令以立即在當前終端機視窗中啟用它：
 
 ```bash
 source ~/.bashrc
 ```
 
-接下來，每次您執行 `agy` 或是 `antigravity` 時，最下方都會顯示精美的雙行狀態列！
+接下來，每次您執行 `agy` 或是 `antigravity` 時，最下方都會顯示您選定語言的精美雙行狀態列！
 
 ---
 
@@ -72,7 +96,7 @@ source ~/.bashrc
 ```
 
 > [!NOTE]
-> 卸載腳本會完全刪除複製到 `~/.gemini/antigravity-cli/` 的檔案，並自動清除 `~/.bashrc` 中寫入的環境變數，不留任何痕跡。
+> 卸載腳本會完全刪除複製到 `~/.gemini/antigravity-cli/` 的檔案（包含腳本及語系設定檔），並自動清除 `~/.bashrc` 中寫入的環境變數，不留任何痕跡。
 
 ---
 

@@ -2,17 +2,42 @@
 # ==============================================================================
 # write_status.sh - Antigravity CLI Custom Dual-Line Statusline Script
 # ==============================================================================
-# 1. 讀取學自 stdin 的完整 JSON 狀態並寫入暫存檔（供外部編輯器/Vim讀取）
+
+# ── 1. 讀取語系設定檔 ──
+CONF_FILE="$HOME/.gemini/antigravity-cli/statusline.conf"
+AGY_LANG="zh-tw" # 預設語系為繁體中文
+
+if [ -f "$CONF_FILE" ]; then
+    . "$CONF_FILE"
+fi
+
+# ── 2. 語系標籤定義 ──
+if [ "$AGY_LANG" = "en" ]; then
+    TXT_RESET="Reset"
+    TXT_PENDING="Pending"
+    TXT_CONTEXT="Context"
+    TXT_RESET_LABEL="5h Reset"
+    TXT_QUOTA="Quota"
+else
+    # 預設 zh-tw 繁體中文
+    TXT_RESET="已重置"
+    TXT_PENDING="待獲取"
+    TXT_CONTEXT="Context"
+    TXT_RESET_LABEL="5h Reset"
+    TXT_QUOTA="Quota"
+fi
+
+# ── 3. 讀取 stdin 的完整 JSON 狀態並寫入暫存檔 ──
 status=$(cat)
 echo "$status" > /tmp/antigravity_status
 
-# ── 2. 獲取核心資訊 ──
+# ── 4. 獲取核心資訊 ──
 model=$(echo "$status" | jq -r '.model.display_name // "Gemini 3.5"' 2>/dev/null)
 remaining=$(echo "$status" | jq -r '.context_window.remaining_percentage // 100' 2>/dev/null | cut -c 1-4)
 state=$(echo "$status" | jq -r '.agent_state // "idle"' 2>/dev/null)
 icon=$( [ "$state" = "working" ] && echo "⚡" || echo "💤" )
 
-# ── 3. 獲取 Git 分支 ──
+# ── 5. 獲取 Git 分支 ──
 cwd=$(echo "$status" | jq -r '.cwd // ""' 2>/dev/null)
 [ -z "$cwd" ] || [ "$cwd" = "null" ] && cwd=$(pwd)
 
@@ -28,10 +53,10 @@ if git -C "$cwd" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     fi
 fi
 
-# ── 4. 獲取 Context 比例 ──
+# ── 6. 獲取 Context 比例 ──
 context_pct=$(echo "$status" | jq -r '.context_window.used_percentage // 0' 2>/dev/null | awk '{printf "%.0f", $1}')
 
-# ── 5. 非同步背景獲取 G1 Credits 餘額（防止阻塞） ──
+# ── 7. 非同步背景獲取 G1 Credits 餘額（防止阻塞） ──
 credits_cache="/tmp/antigravity_credits.txt"
 credits_lock="/tmp/antigravity_credits_lock.txt"
 now=$(date +%s)
@@ -57,7 +82,7 @@ fi
 
 g1_credits=$(cat "$credits_cache" 2>/dev/null || echo "G1: 982")
 
-# ── 6. 獲取 5 小時 Reset 剩餘時間 (優良快取自癒架構，拒絕全域狀態污染) ──
+# ── 8. 獲取 5 小時 Reset 剩餘時間 (優良快取自癒架構) ──
 iso_to_epoch() {
     local iso_str="$1"
     local epoch
@@ -88,7 +113,7 @@ format_reset_time() {
     local diff=$(( epoch - now ))
 
     if [ "$diff" -le 0 ]; then
-        echo "已重置"
+        echo "$TXT_RESET"
         return
     fi
 
@@ -146,13 +171,13 @@ if [ -f "$usage_cache_file" ]; then
 fi
 
 if [ -z "$reset_time" ] || [ "$reset_time" = "null" ]; then
-    reset_time="待獲取"
+    reset_time="$TXT_PENDING"
 fi
 
-# ── 7. 顯示完整路徑 ──
+# ── 9. 顯示完整路徑 ──
 display_cwd=$(echo "$cwd" | sed "s|^$HOME|~|")
 
-# ── 8. 極致美觀雙行排版設計 ──
+# ── 10. 極致美觀雙行排版設計 ──
 # 第一行：完整路徑、Git 分支、工作狀態、模型資訊
 line1="📁 ${display_cwd}"
 if [ -n "$git_branch" ]; then
@@ -161,7 +186,7 @@ fi
 line1+="  ${icon}  ${model}"
 
 # 第二行：詳細 Context 百分比、5 小時重置倒數、G1 Credits、剩餘配額
-line2="📊 Context: ${context_pct}%  │  ⟳ 5h Reset: ${reset_time}  │  💳 ${g1_credits}  │  🔋 Quota: ${remaining}%"
+line2="📊 ${TXT_CONTEXT}: ${context_pct}%  │  ⟳ ${TXT_RESET_LABEL}: ${reset_time}  │  💳 ${g1_credits}  │  🔋 ${TXT_QUOTA}: ${remaining}%"
 
 # 輸出雙行
 printf "%s\n%s" "$line1" "$line2"

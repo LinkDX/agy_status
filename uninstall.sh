@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# uninstall.sh - Antigravity CLI Custom Statusline 卸載腳本
+# uninstall.sh - Antigravity CLI Custom Statusline 卸載與清理腳本
 # ==============================================================================
-# 此腳本會安全地移除 write_status.sh，並清理 ~/.bashrc 中的環境變數設定。
+# 此腳本會安全地移除 write_status.sh 與 statusline.conf，並清理 ~/.bashrc 中的環境變數設定。
 # ==============================================================================
 
 set -e
@@ -18,9 +18,10 @@ echo -e "${YELLOW}       正在移除 Antigravity CLI Statusline...       ${NC}"
 echo -e "${YELLOW}====================================================${NC}"
 
 TARGET_FILE="$HOME/.gemini/antigravity-cli/write_status.sh"
+CONF_FILE="$HOME/.gemini/antigravity-cli/statusline.conf"
 BASHRC="$HOME/.bashrc"
 
-# 1. 移除目標腳本
+# 1. 移除目標腳本與設定檔
 if [ -f "$TARGET_FILE" ]; then
     echo -e "正在移除 $TARGET_FILE..."
     rm "$TARGET_FILE"
@@ -29,15 +30,20 @@ else
     echo -e "ℹ 找不到 $TARGET_FILE，跳過此步驟。"
 fi
 
+if [ -f "$CONF_FILE" ]; then
+    echo -e "正在移除語系設定檔 $CONF_FILE..."
+    rm "$CONF_FILE"
+    echo -e "${GREEN}✓ 已刪除 statusline.conf 語系設定檔${NC}"
+else
+    echo -e "ℹ 找不到 $CONF_FILE，跳過此步驟。"
+fi
+
 # 2. 清理 .bashrc 中的啟動環境變數
 if [ -f "$BASHRC" ]; then
     echo -e "正在從 $BASHRC 中清理環境變數代碼..."
     
     TEMP_BASHRC=$(mktemp)
     
-    # 移除相關的兩行：
-    # # Antigravity CLI Custom Statusline
-    # export CLAUDE_STATUS_LINE_COMMAND="$HOME/.gemini/antigravity-cli/write_status.sh"
     perl -0777 -pe 's/\n# Antigravity CLI Custom Statusline\nexport CLAUDE_STATUS_LINE_COMMAND="\$HOME\/\.gemini\/antigravity-cli\/write_status\.sh"//g' "$BASHRC" > "$TEMP_BASHRC"
     
     # 回寫到 .bashrc
