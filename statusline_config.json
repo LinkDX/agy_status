@@ -9,7 +9,6 @@
       "quota",
       "quota-reset-countdown",
       "g1-credits",
-      "context-used",
       "token-count"
     ]
   }
