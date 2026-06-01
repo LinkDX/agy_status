@@ -8,21 +8,27 @@
 
 ---
 
-## 🎨 狀態列排版設計 (多語系支援)
+## 🎨 實際輸出樣式預覽 (與真實程式碼 100% 一致)
 
-### 繁體中文 (zh-tw)
-```
-📁 ~/your-project-path  🌿 (main*)  💤  Gemini 3.5 Flash
-📊 Context: 12%  │  ⟳ 5h Reset: 4h12m  │  💳 G1: 982  │  🔋 Quota: 85.5%
-```
-*(若 API 在重置狀態，會於 5h Reset 中顯示 **「已重置」**；載入中會顯示 **「待獲取」**。)*
+狀態列會依據您安裝時選擇的語系（繁體中文 或 英文）動態呈現對應的文字。
 
-### 英文 (en)
+### 📌 繁體中文版本 (zh-tw)
+當您剛啟動或處於重置狀態時，將會呈現以下真實外觀：
+
+```text
+📁 ~/your-project-path  🌿 (main*)  💤  Gemini 3.5
+📊 Context: 12%  │  ⟳ 5h Reset: 待獲取  │  💳 G1: 982  │  🔋 Quota: 85.5%
 ```
-📁 ~/your-project-path  🌿 (main*)  💤  Gemini 3.5 Flash
-📊 Context: 12%  │  ⟳ 5h Reset: 4h12m  │  💳 G1: 982  │  🔋 Quota: 85.5%
+*(若 API 的五小時限制已完成重置，狀態會自動自癒顯示為：`⟳ 5h Reset: 已重置`)*
+
+### 📌 英文版本 (en)
+若您選擇英文語系，提示文字會自動本地化，呈現以下真實外觀：
+
+```text
+📁 ~/your-project-path  🌿 (main*)  💤  Gemini 3.5
+📊 Context: 12%  │  ⟳ 5h Reset: Pending  │  💳 G1: 982  │  🔋 Quota: 85.5%
 ```
-*(若 API 在重置狀態，會於 5h Reset 中顯示 **「Reset」**；載入中會顯示 **「Pending」**。)*
+*(若 API 的五小時限制已完成重置，狀態會自動自癒顯示為：`⟳ 5h Reset: Reset`)*
 
 ---
 
