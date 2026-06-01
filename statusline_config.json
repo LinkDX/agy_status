@@ -3,13 +3,13 @@
     "hideSandboxStatus": true,
     "showLabels": true,
     "items": [
+      "project-path",
       "git-branch",
       "model-name",
       "quota",
-      "context-used",
-      "project-path",
       "quota-reset-countdown",
-      "g1-credits"
+      "g1-credits",
+      "token-count"
     ]
   }
 }
