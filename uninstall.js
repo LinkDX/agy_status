@@ -67,7 +67,7 @@ restoreSettingsFile(globalSettingsFile);
 restoreSettingsFile(cliSettingsFile);
 
 // ── 移除安裝的核心 hooks 檔案 ──
-const hooksDir = path.join(homeDir, '.gemini', 'hooks');
+const hooksDir = path.join(homeDir, '.gemini', 'antigravity-cli', 'hooks');
 const filesToRemove = ['statusline-quota.mjs', 'fetch-local-quota.mjs'];
 
 filesToRemove.forEach(fileName => {

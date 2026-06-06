@@ -429,7 +429,7 @@ function startInteractiveConfig() {
 // ── 8. 寫入設定檔 ──
 function saveSettings(selectedLang, finalItems) {
   // ── 8.0 複製 scripts 目錄下的核心檔案至全域 hooks ──
-  const hooksDir = path.join(homeDir, '.gemini', 'hooks');
+  const hooksDir = path.join(homeDir, '.gemini', 'antigravity-cli', 'hooks');
   try {
     if (!fs.existsSync(hooksDir)) {
       fs.mkdirSync(hooksDir, { recursive: true });
@@ -449,6 +449,43 @@ function saveSettings(selectedLang, finalItems) {
     });
   } catch (err) {
     console.log(`${RED}❌ 複製核心 scripts 檔案至 hooks 失敗：${err.message}${RESET}`);
+  }
+
+  // ── 8.1 Windows 平台編譯 sh.exe (越獄無窗體橋接器) ──
+  if (process.platform === 'win32') {
+    console.log(`\n${BLUE}正在為 Windows 平台編譯靜默 sh.exe 橋接器...${RESET}`);
+    try {
+      // 取得 CLI 執行目錄
+      const agyPathStr = execSync('where agy', { encoding: 'utf8', stdio: ['pipe', 'ignore', 'ignore'] }).trim().split('\n')[0].trim();
+      const cliDir = path.dirname(agyPathStr);
+      
+      // 檢查並清理舊版錯置的 sh.exe (在 node.exe 的目錄下)
+      const nodeDir = path.dirname(process.execPath);
+      const wrongShPath = path.join(nodeDir, 'sh.exe');
+      if (fs.existsSync(wrongShPath)) {
+        console.log(`${YELLOW}⚠ 發現舊版錯置的 sh.exe：${wrongShPath}${RESET}`);
+        console.log(`${YELLOW}   請手動刪除它以避免污染系統環境！${RESET}`);
+      }
+
+      // 動態尋找 csc.exe 並編譯
+      const cscPathCmd = `(Get-ChildItem -Path 'C:\\Windows\\Microsoft.NET\\Framework64\\v*\\csc.exe' | Sort-Object LastWriteTime -Descending | Select-Object -First 1).FullName`;
+      const cscPath = execSync(`powershell -NoProfile -Command "${cscPathCmd}"`, { encoding: 'utf8', stdio: ['pipe', 'ignore', 'ignore'] }).trim();
+      
+      if (cscPath && fs.existsSync(cscPath)) {
+        const shHiddenCsPath = path.join(__dirname, 'scripts', 'sh_hidden.cs');
+        const outShPath = path.join(cliDir, 'sh.exe');
+        if (fs.existsSync(shHiddenCsPath)) {
+          execSync(`"${cscPath}" /target:winexe /out:"${outShPath}" "${shHiddenCsPath}"`, { stdio: 'ignore' });
+          console.log(`${GREEN}✓ 成功編譯並部署無窗體 sh.exe 至：${outShPath}${RESET}`);
+        } else {
+          console.log(`${YELLOW}⚠ 找不到原始程式碼：${shHiddenCsPath}，無法編譯 sh.exe${RESET}`);
+        }
+      } else {
+        console.log(`${YELLOW}⚠ 找不到 csc.exe，無法自動編譯 sh.exe，請確認您的系統已安裝 .NET Framework。${RESET}`);
+      }
+    } catch (e) {
+      console.log(`${YELLOW}⚠ 自動編譯 sh.exe 發生錯誤 (可能未安裝 agy CLI)：${e.message}${RESET}`);
+    }
   }
 
   console.log(`\n${BLUE}正在套用狀態列配置至系統設定檔...${RESET}`);
@@ -503,7 +540,7 @@ function saveSettings(selectedLang, finalItems) {
     // 確保 statusLine 配置指向全域 hooks 中的 statusline-quota.mjs
     if (!settings.statusLine) settings.statusLine = {};
     settings.statusLine.type = "command";
-    settings.statusLine.command = "node " + path.join(homeDir, '.gemini', 'hooks', 'statusline-quota.mjs');
+    settings.statusLine.command = "node " + path.join(homeDir, '.gemini', 'antigravity-cli', 'hooks', 'statusline-quota.mjs');
 
     // 額外美化：讓 chat 中顯示 Model 資訊，增強視覺
     settings.ui.showModelInfoInChat = true;
